@@ -712,6 +712,3 @@ class RunGradCAMImage:
         )
 
         return dashboard
-
-
-# panel serve ./grad_cam_efficientnet_b0.py --dev --port 8000 --show
