@@ -595,20 +595,8 @@ class RunGradCAMImage:
         batch_size,
         learning_rate,
         epochs,
-        random_crop_size_option,
-        color_jitter_brightness_option,
-        color_jitter_contrast_option,
-        color_jitter_saturation_option,
-        color_jitter_hue_option,
-        random_perspective_distortion_scale_option,
-        random_rotation_degrees_option,
-        random_affine_degrees_option,
-        random_affine_translate_option,
-        random_affine_scale_min_option,
-        random_affine_scale_max_option,
-        random_affine_shear_option,
     ):
-        # options
+        # data options
         kind_data_option = pn.widgets.Select(
             name="Kind of Data", options=self.kind_data, value="train"
         )
@@ -620,6 +608,48 @@ class RunGradCAMImage:
             name="Target Class",
             options=self.name_classes + ["Predicted", "True"],
             value="Predicted",
+        )
+
+        # grad_cam augmentation options
+        random_crop_size_option = pn.widgets.IntSlider(
+            name="Random Crop Size", start=50, end=200, step=10, value=100
+        )
+        color_jitter_brightness_option = pn.widgets.FloatSlider(
+            name="Color Jitter Brightness", start=0.0, end=1.0, step=0.1, value=0.5
+        )
+        color_jitter_contrast_option = pn.widgets.FloatSlider(
+            name="Color Jitter Contrast", start=0.0, end=1.0, step=0.1, value=0.5
+        )
+        color_jitter_saturation_option = pn.widgets.FloatSlider(
+            name="Color Jitter Saturation", start=0.0, end=1.0, step=0.1, value=0.5
+        )
+        color_jitter_hue_option = pn.widgets.FloatSlider(
+            name="Color Jitter Hue", start=0.0, end=0.5, step=0.1, value=0.3
+        )
+        random_perspective_distortion_scale_option = pn.widgets.FloatSlider(
+            name="Random Perspective Distortion Scale",
+            start=0.0,
+            end=1.0,
+            step=0.1,
+            value=0.8,
+        )
+        random_rotation_degrees_option = pn.widgets.IntSlider(
+            name="Random Rotation Degrees", start=0, end=360, step=10, value=180
+        )
+        random_affine_degrees_option = pn.widgets.IntSlider(
+            name="Random Affine Degrees", start=0, end=360, step=10, value=180
+        )
+        random_affine_translate_option = pn.widgets.FloatSlider(
+            name="Random Affine Translate", start=0.0, end=0.5, step=0.05, value=0.5
+        )
+        random_affine_scale_min_option = pn.widgets.FloatSlider(
+            name="Random Affine Scale Min", start=0.5, end=1.0, step=0.05, value=0.9
+        )
+        random_affine_scale_max_option = pn.widgets.FloatSlider(
+            name="Random Affine Scale Max", start=1.0, end=1.5, step=0.05, value=1.5
+        )
+        random_affine_shear_option = pn.widgets.IntSlider(
+            name="Random Affine Shear", start=0, end=45, step=5, value=10
         )
 
         # bind interaction
@@ -674,7 +704,8 @@ class RunGradCAMImage:
             ),
             interactive_gradcam,
         )
-        dashboard.servable()
+
+        return dashboard
 
 
 # panel serve ./grad_cam_efficientnet_b0.py --dev --port 8000 --show

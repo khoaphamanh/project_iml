@@ -40,42 +40,17 @@ def main():
     # set seed
     set_seed(seed)
 
-    # augmentation options
-    random_crop_size_option = config.random_crop_size_option
-    color_jitter_brightness_option = config.color_jitter_brightness_option
-    color_jitter_contrast_option = config.color_jitter_contrast_option
-    color_jitter_saturation_option = config.color_jitter_saturation_option
-    color_jitter_hue_option = config.color_jitter_hue_option
-    random_perspective_distortion_scale_option = (
-        config.random_perspective_distortion_scale_option
-    )
-    random_rotation_degrees_option = config.random_rotation_degrees_option
-    random_affine_degrees_option = config.random_affine_degrees_option
-    random_affine_translate_option = config.random_affine_translate_option
-    random_affine_scale_min_option = config.random_affine_scale_min_option
-    random_affine_scale_max_option = config.random_affine_scale_max_option
-    random_affine_shear_option = config.random_affine_shear_option
-
     # run
     run_grad_cam = RunGradCAMImage(seed=seed)
-    run_grad_cam.run_image_grad_cam(
+    dashboard = run_grad_cam.run_image_grad_cam(
         batch_size=batch_size_gc,
         learning_rate=learning_rate_gc,
         epochs=epochs_gc,
-        random_crop_size_option=random_crop_size_option,
-        color_jitter_brightness_option=color_jitter_brightness_option,
-        color_jitter_contrast_option=color_jitter_contrast_option,
-        color_jitter_saturation_option=color_jitter_saturation_option,
-        color_jitter_hue_option=color_jitter_hue_option,
-        random_perspective_distortion_scale_option=random_perspective_distortion_scale_option,
-        random_rotation_degrees_option=random_rotation_degrees_option,
-        random_affine_degrees_option=random_affine_degrees_option,
-        random_affine_translate_option=random_affine_translate_option,
-        random_affine_scale_min_option=random_affine_scale_min_option,
-        random_affine_scale_max_option=random_affine_scale_max_option,
-        random_affine_shear_option=random_affine_shear_option,
     )
+    dashboard.show()
 
 
 if __name__ == "__main__":
     main()
+
+# main()
