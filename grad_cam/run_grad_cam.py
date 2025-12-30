@@ -43,7 +43,11 @@ class RunGradCAMImage:
         self.path_dataset_image_directory = os.path.join(
             self.path_data_directory, "dataset_image"
         )
-        self.name_classes = os.listdir(self.path_dataset_image_directory + "/train")
+        self.name_classes = [
+            i
+            for i in os.listdir(self.path_dataset_image_directory + "/train")
+            if "." not in i
+        ]
         self.kind_data = ["train", "test"]
 
         # path pretrained model
