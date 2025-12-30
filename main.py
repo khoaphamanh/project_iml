@@ -27,8 +27,6 @@ def set_seed(seed=42):
     # Python hash seed (for Python 3.3+)
     os.environ["PYTHONHASHSEED"] = str(seed)
 
-    print(f"Random seed set to {seed}")
-
 
 def main():
 

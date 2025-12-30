@@ -361,7 +361,6 @@ class RunGradCAMImage:
             f"True: {classes_dict_idx_to_str[label]}<br>Pred: {classes_dict_idx_to_str[int(y_pred[i])]}<br>Prob: {y_prob[i]:.4f}<br>Aug: {names_augmentation[i]}"
             for i in range(num_images)
         ]
-        print("title_row 1", title_row_1)
         title_row_2 = [
             f"Grad-CAM (Original)<br>shape: {grad_cam_original[0].shape}"
         ] + ["" for _ in range(1, num_images)]
@@ -472,6 +471,14 @@ class RunGradCAMImage:
                 col=i + 1,
             )
 
+        # layout
+        if target_class_str == "Predicted":
+            target_class_str = (
+                target_class_str + f" {classes_dict_idx_to_str[int(y_pred[0])]}"
+            )
+        elif target_class_str == "True":
+            target_class_str = target_class_str + f" {classes_dict_idx_to_str[label]}"
+
         fig.update_layout(
             height=1200,
             width=2000,
@@ -516,7 +523,6 @@ class RunGradCAMImage:
             self.path_grad_cam_pretrained_model_directory,
             f"model_image_{self.seed}_{epochs}_{batch_size}_{int(learning_rate * 1000)}.pt",
         )
-        print(f"Path model: {path_model}")
         if not os.path.exists(path_model):
             self.train(batch_size, learning_rate, epochs)
 

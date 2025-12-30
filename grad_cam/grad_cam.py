@@ -22,7 +22,6 @@ def get_gradcam(
 
     def callback_hook(module, grad_input, grad_output):
         # grad_output
-        print(f"Hook called on: {module.__class__.__name__}")
         gradients_captured["feature_map"] = grad_output[0].detach()
 
     # register hook
@@ -52,12 +51,9 @@ def get_gradcam(
     model.zero_grad()
 
     # Create one-hot encoding for target classes: sum over batch for efficiency
-    print("target_class:", target_class_int)
     one_hot = torch.zeros_like(logits)  # (B, num_classes)
-    print("one_hot:", one_hot)
     for i in range(batch_size):
         one_hot[i, target_class_int[i]] = 1.0
-    print("one_hot:", one_hot)
 
     # Backward from sum of target class scores (equivalent to batched backprop)
     logits_target = (logits * one_hot).sum()
@@ -90,7 +86,6 @@ def get_gradcam(
         mode="bilinear",
         align_corners=False,
     ).squeeze(1)
-    print("grad_cam_upsampled:", grad_cam_upsampled.shape)
 
     # normalize grad cam
     gradcam_original_normalized = []
