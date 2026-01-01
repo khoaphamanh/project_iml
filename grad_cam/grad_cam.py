@@ -3,6 +3,14 @@ import torch
 import torch.nn.functional as F
 
 
+def normalize_batch_gradcam(tensor, batch_size):
+    """Normalize each sample in batch to [0, 1] independently."""
+    flat = tensor.view(batch_size, -1)
+    min_vals = flat.min(dim=1, keepdim=True)[0].view(batch_size, 1, 1)
+    max_vals = flat.max(dim=1, keepdim=True)[0].view(batch_size, 1, 1)
+    return (tensor - min_vals) / (max_vals - min_vals + 1e-8)
+
+
 def get_gradcam(
     model: EfficientNetB0Modified,
     input_tensor: torch.Tensor,
@@ -12,23 +20,13 @@ def get_gradcam(
     # model in eval mode
     model.eval()
     batch_size = input_tensor.shape[0]
-    layer_feature_efficientnet_b0 = model.efficient_net_b0_features
 
-    # unfreeze features
+    # unfreeze model
     model.unfreeze_features()
-
-    # call back hook to get gradients
-    gradients_captured = {}
-
-    def callback_hook(module, grad_input, grad_output):
-        # grad_output
-        gradients_captured["feature_map"] = grad_output[0].detach()
-
-    # register hook
-    hook = layer_feature_efficientnet_b0.register_full_backward_hook(callback_hook)
 
     # forward pass
     feature_map, logits = model.get_feature_maps(input_tensor)
+    feature_map.retain_grad()
 
     if target_class_int is None:
         # target class as predicted class
@@ -51,19 +49,17 @@ def get_gradcam(
     model.zero_grad()
 
     # Create one-hot encoding for target classes: sum over batch for efficiency
-    one_hot = torch.zeros_like(logits)  # (B, num_classes)
-    for i in range(batch_size):
-        one_hot[i, target_class_int[i]] = 1.0
+    print("target_class:", target_class_int)
+    one_hot = F.one_hot(target_class_int, num_classes=logits.shape[1]).float()
+    print("one_hot:", one_hot)
 
     # Backward from sum of target class scores (equivalent to batched backprop)
     logits_target = (logits * one_hot).sum()
-    logits_target.backward(retain_graph=True)
-
-    # remove the hook
-    hook.remove()
+    model.zero_grad()
+    logits_target.backward()
 
     # calculate gradients, weights alpha
-    gradients = gradients_captured["feature_map"]  # Shape: (B, C, H, W)
+    gradients = feature_map.grad  # Shape: (B, C, H, W)
     weights_alpha = torch.mean(gradients, dim=[2, 3])  # Shape: (B, C)
 
     # weighted combination Σ_k α_k^c * A^k for each image
@@ -86,31 +82,13 @@ def get_gradcam(
         mode="bilinear",
         align_corners=False,
     ).squeeze(1)
+    print("grad_cam_upsampled:", grad_cam_upsampled.shape)
 
     # normalize grad cam
-    gradcam_original_normalized = []
-    gradcam_upsampled_normalized = []
-
-    for i in range(batch_size):
-        # Normalize original resolution
-        cam_orig = grad_cam_original[i]
-        cam_orig = cam_orig - cam_orig.min()
-        cam_orig = cam_orig / (cam_orig.max() + 1e-8)
-        gradcam_original_normalized.append(cam_orig)
-
-        # Normalize upsampled
-        cam_up = grad_cam_upsampled[i]
-        cam_up = cam_up - cam_up.min()
-        cam_up = cam_up / (cam_up.max() + 1e-8)
-        gradcam_upsampled_normalized.append(cam_up)
-
-    # Stack into tensors
-    gradcam_original_normalized = torch.stack(
-        gradcam_original_normalized
-    )  # (B, H_feat, W_feat)
-    gradcam_upsampled_normalized = torch.stack(
-        gradcam_upsampled_normalized
-    )  # (B, 224, 224)
+    gradcam_original_normalized = normalize_batch_gradcam(grad_cam_original, batch_size)
+    gradcam_upsampled_normalized = normalize_batch_gradcam(
+        grad_cam_upsampled, batch_size
+    )
 
     # freeze features again
     model.freeze_features()
