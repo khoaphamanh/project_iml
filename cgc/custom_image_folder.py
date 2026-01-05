@@ -42,15 +42,17 @@ class ImageFolderCustom(ImageFolder):
         # image for cross entropy loss
         x_ce = self.transform(img)
 
-        # image for grad cam (first only resize)
-        x_grad_cam = self.resize(img)
-        x_grad_cam = self.center_crop(x_grad_cam)
+        # image for grad cam original (first only resize)
+        x_grad_cam_original = self.resize(img)
+        x_grad_cam_original = self.center_crop(x_grad_cam_original)
 
         # image for grad cam aug random resize crop
         i, j, h, w = transforms.RandomResizedCrop.get_params(
-            x_grad_cam, scale=(0.08, 1.0), ratio=(0.75, 1.3333333333333333)
+            x_grad_cam_original, scale=(0.08, 1.0), ratio=(0.75, 1.3333333333333333)
         )
-        x_grad_cam_aug = F.resized_crop(x_grad_cam, i, j, h, w, size=(224, 224))
+        x_grad_cam_aug = F.resized_crop(
+            x_grad_cam_original, i, j, h, w, size=(224, 224)
+        )
 
         # horizontal flip
         p = random.random()
@@ -63,11 +65,11 @@ class ImageFolderCustom(ImageFolder):
         x_grad_cam_aug = self.to_tensor(x_grad_cam_aug)
         x_grad_cam_aug = self.normalize(x_grad_cam_aug)
 
-        # image for grad cam to tensor and normalize
-        x_grad_cam = self.to_tensor(x_grad_cam)
-        x_grad_cam = self.normalize(x_grad_cam)
+        # image for grad cam original to tensor and normalize
+        x_grad_cam_original = self.to_tensor(x_grad_cam_original)
+        x_grad_cam_original = self.normalize(x_grad_cam_original)
 
-        return x_ce, x_grad_cam, x_grad_cam_aug, i, j, h, w, hor_flip, target
+        return x_ce, x_grad_cam_original, x_grad_cam_aug, i, j, h, w, hor_flip, target
 
 
 if __name__ == "__main__":
@@ -102,3 +104,29 @@ if __name__ == "__main__":
             print(i.shape)
         else:
             print(i)
+
+
+def transform_grad_cam_given_parameters(grad_cam_ori, i, j, h, w, hor_flip):
+
+    batch_size = grad_cam_ori.shape[0]
+    grad_cam_transformed = []
+
+    for idx in range(batch_size):
+
+        # apply crop
+        gc_crop = F.resized_crop(
+            grad_cam_ori[idx],
+            i[idx].item(),
+            j[idx].item(),
+            h[idx].item(),
+            w[idx].item(),
+            size=(224, 224),
+        )
+
+        # apply horizontal flip
+        if hor_flip[idx]:
+            gc_crop = F.hflip(gc_crop)
+
+        grad_cam_transformed.append(gc_crop)
+
+    return torch.stack(grad_cam_transformed)
