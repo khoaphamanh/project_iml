@@ -23,7 +23,7 @@ The explanation methods are then evaluated using a **Top-K Overlap (TKO)** metri
 
 The model is implemented in `custom_model_mvt.py`  and consists of:
 
-* Encoder: Pretrained EfficientNet-B0 (partially fine-tuned)
+* Encoder: Pretrained EfficientNet-B0 (no freezed)
 * Decoder: Convolutional transpose network for pixel reconstruction
 * Classifier head: Linear layer for defect classification
 
@@ -109,7 +109,7 @@ Implemented in `run_mvt.py` .
 
 ![Figure 2. Top-K Overlap (TKO) visualization](images/tko.svg)
 
-# Experimental Results
+## Experimental Results
 
 Experiments were run over:
 
@@ -118,6 +118,14 @@ Experiments were run over:
 * Balanced accuracy evaluation
 
 ![Figure 4. Loss and accuracy across seeds](images/loss_accuracy.svg)
+
+##### Model performance averaged over 10 random seeds (Epoch 30)
+
+| Split | Loss Total | Loss CE | Loss BCE | Balanced Accuracy |
+|-------|------------|---------|----------|-------------------|
+| Train | 0.0631 ± 0.0530 | 0.0581 ± 0.0527 | 0.0050 ± 0.0007 | 0.9837 ± 0.0144 |
+| Test  | 0.2087 ± 0.1745 | 0.2006 ± 0.1736 | 0.0081 ± 0.0014 | 0.9443 ± 0.0467 |
+
 
 #### Key Findings
 
@@ -130,7 +138,24 @@ Grad-CAM benefits from high-level semantic feature maps, while SM and IG operate
 
 ![Figure 3. Win-rate across methods](images/win_rate.svg)
 
-### Core Files
+#### Win-rate averaged over 10 random seeds
+
+| Split | Class   | GC               | SM               | IG               |
+|--------|---------|------------------|------------------|------------------|
+| Train | Overall | **0.8713 ± 0.0678** | 0.0486 ± 0.0382 | 0.0801 ± 0.0564 |
+| Train | Crack   | **0.9104 ± 0.0740** | 0.0591 ± 0.0543 | 0.0305 ± 0.0495 |
+| Train | Cut     | **0.7968 ± 0.1119** | 0.0160 ± 0.0321 | 0.1872 ± 0.1181 |
+| Train | Hole    | **0.8643 ± 0.1445** | 0.1143 ± 0.1204 | 0.0214 ± 0.0327 |
+| Train | Print   | **0.9077 ± 0.1278** | 0.0000 ± 0.0000 | 0.0923 ± 0.1278 |
+| Test  | Overall | **0.9017 ± 0.0739** | 0.0192 ± 0.0405 | 0.0792 ± 0.0712 |
+| Test  | Crack   | **0.9167 ± 0.1291** | 0.0333 ± 0.1000 | 0.0500 ± 0.1000 |
+| Test  | Cut     | **0.8250 ± 0.1601** | 0.0000 ± 0.0000 | 0.1750 ± 0.1601 |
+| Test  | Hole    | **0.9250 ± 0.1601** | 0.0500 ± 0.1500 | 0.0250 ± 0.0750 |
+| Test  | Print   | **0.9500 ± 0.1000** | 0.0000 ± 0.0000 | 0.0500 ± 0.1000 |
+
+
+
+## Core Files
 
 | File                     | Description                       |
 | ------------------------ | --------------------------------- |
@@ -162,7 +187,6 @@ Install dependencies:
 ```bash
 pip install -r requirements.txt
 ```
-
 
 ## Running the Project
 
@@ -223,11 +247,15 @@ Generated results include:
 * Selvaraju et al., Grad-CAM (2019)
 * Simonyan et al., Saliency Maps (2013)
 * Sundararajan et al., Integrated Gradients (2017)
+* Tan & Le, EfficientNet: Rethinking Model Scaling for Convolutional Neural Networks (2019)
 * MVTec AD Dataset (2019)
 
 ## Author
 
 Anh Khoa Pham
+
 Group: vibe_coding_scientist
+
 Interpretable Machine Learning Course
+
 Email: pham.anhkhoa1215@gmail.com
