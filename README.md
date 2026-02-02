@@ -70,7 +70,7 @@ Classes:
 
 Dataset handling is implemented in `custom_dataset_mvt.py` .
 
-If the dataset is not automatically downloaded when running the code, download it from:
+Dataset is automatically downloaded when running the code, if not download it from:
 ```
 https://seafile.cloud.uni-hannover.de/f/d007fcef288648378676/?dl=1
 ```
