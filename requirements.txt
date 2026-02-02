@@ -1,0 +1,11 @@
+torch
+torchvision 
+notebook
+scikit-learn
+plotly
+matplotlib
+kaleido
+scikit-image
+panel
+torchinfo
+captum
