@@ -211,7 +211,7 @@ Note: We provide pretrained model weights in `mvt/pretrained_models`. If you wan
 
 ### Outputs
 
-Generated results include:
+Generated results in `plot_results/visualize` include:
 
 * Accuracy & loss plots
 * Win-rate boxplots
