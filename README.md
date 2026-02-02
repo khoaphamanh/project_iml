@@ -29,7 +29,7 @@ The model is implemented in `custom_model_mvt.py`  and consists of:
 
 The model performs multitask learning:
 
-L = L_{CE} + \beta L_{reconstruction}
+`L = L_CE + β L_reconstruction`
 
 Where:
 
