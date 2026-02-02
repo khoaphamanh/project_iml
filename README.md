@@ -37,6 +37,8 @@ Where:
 * Reconstruction loss for defect mask prediction
 * β controls the trade-off
 
+![Figure 1. Training pipeline and model architecture](images/training_pipeline.svg)
+
 
 ### Training Hyperparameters
 
@@ -67,6 +69,12 @@ Classes:
 * `print`
 
 Dataset handling is implemented in `custom_dataset_mvt.py` .
+
+If the dataset is not automatically downloaded when running the code, download it from:
+```
+https://seafile.cloud.uni-hannover.de/f/d007fcef288648378676/?dl=1
+```
+Then unzip it into the `data` directory with the folder name `MVTec_dataset`.
 
 ## Explanation Methods
 
@@ -99,6 +107,8 @@ The method with highest TKO wins for that image.
 
 Implemented in `run_mvt.py` .
 
+![Figure 2. Top-K Overlap (TKO) visualization](images/tko.svg)
+
 # Experimental Results
 
 Experiments were run over:
@@ -106,6 +116,8 @@ Experiments were run over:
 * 10 random seeds
 * 30 training epochs
 * Balanced accuracy evaluation
+
+![Figure 4. Loss and accuracy across seeds](images/loss_accuracy.svg)
 
 #### Key Findings
 
@@ -115,6 +127,8 @@ Experiments were run over:
 * Saliency Maps perform worst
 
 Grad-CAM benefits from high-level semantic feature maps, while SM and IG operate directly on noisy input gradients.
+
+![Figure 3. Win-rate across methods](images/win_rate.svg)
 
 ### Core Files
 
@@ -149,7 +163,6 @@ Install dependencies:
 pip install -r requirements.txt
 ```
 
----
 
 ## Running the Project
 
@@ -167,6 +180,8 @@ This will:
 * Compute win-rates
 * Generate plots
 * Launch interactive Top-K visualization dashboard
+
+Note: We provide pretrained model weights in `mvt/pretrained_models`. If you want to run the project from scratch, remove this folder. Otherwise, the code will use the pretrained weights and compute statistics and metrics based on them.
 
 
 
@@ -216,4 +231,3 @@ Anh Khoa Pham
 Group: vibe_coding_scientist
 Interpretable Machine Learning Course
 Email: pham.anhkhoa1215@gmail.com
-
